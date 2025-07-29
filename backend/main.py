@@ -5,7 +5,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
-# Carregar variáveis do .env
+# Carregar variáveis do .env (apenas para desenvolvimento local)
 load_dotenv()
 
 # Inicializar o FastAPI
@@ -14,7 +14,10 @@ app = FastAPI()
 # Habilitar CORS para permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://chatbotvina.vercel.app/chat"],  # Ajuste para o domínio do seu frontend, se necessário
+    allow_origins=[
+        "https://chatbotvina.vercel.app",  # Domínio do frontend no Vercel
+        "http://localhost:3000",           # Para testes locais
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,16 +30,26 @@ class ChatInput(BaseModel):
 # Inicializar o cliente OpenAI
 openai_api_key = os.getenv("OPENAI_API_KEY")
 vector_store_id = os.getenv("VECTOR_STORE_ID")
+
+# Verificar se as variáveis de ambiente estão definidas
+if not openai_api_key:
+    raise ValueError("OPENAI_API_KEY não está definida no ambiente.")
+if not vector_store_id:
+    raise ValueError("VECTOR_STORE_ID não está definida no ambiente.")
+
 client = OpenAI(api_key=openai_api_key)
 
 # Criar ou recuperar um assistente com o vector store
-assistant = client.beta.assistants.create(
-    name="PrenatalAssistant",
-    instructions="Você é um assistente especializado em informações sobre pré-natal. Responda às perguntas com base nos documentos fornecidos no vector store e em seu conhecimento geral.",
-    model="gpt-4o-mini",
-    tools=[{"type": "file_search"}],
-    tool_resources={"file_search": {"vector_store_ids": [vector_store_id]}}
-) if vector_store_id else None
+try:
+    assistant = client.beta.assistants.create(
+        name="PrenatalAssistant",
+        instructions="Você é um assistente especializado em informações sobre pré-natal. Responda às perguntas com base nos documentos fornecidos no vector store e em seu conhecimento geral.",
+        model="gpt-4o-mini",
+        tools=[{"type": "file_search"}],
+        tool_resources={"file_search": {"vector_store_ids": [vector_store_id]}}
+    )
+except Exception as e:
+    raise ValueError(f"Erro ao criar assistente OpenAI: {str(e)}")
 
 # Endpoint para processar a query do usuário
 @app.post("/chat")
@@ -68,4 +81,4 @@ async def chat_with_gpt(input: ChatInput):
 
         return {"response": response_content}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao processar a query: {str(e)}")
