@@ -2,14 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
+      "src": "index.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/vite"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "https://chatbotgestantes.onrender.com"  
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
