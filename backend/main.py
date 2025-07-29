@@ -14,7 +14,7 @@ app = FastAPI()
 # Habilitar CORS para permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ajuste para o domínio do seu frontend, se necessário
+    allow_origins=["https://chatbotvina.vercel.app/chat"],  # Ajuste para o domínio do seu frontend, se necessário
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

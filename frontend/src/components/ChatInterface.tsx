@@ -25,6 +25,9 @@ const ChatInterface = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
+  // URL da API configurada via variável de ambiente
+  const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
     document.documentElement.classList.toggle("dark");
@@ -53,7 +56,7 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
+      const response = await fetch(`${API_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: newMessage }),
@@ -159,7 +162,6 @@ const ChatInterface = () => {
                           : "bg-gray-100 dark:bg-gray-800/50"
                       }`}
                     >
-                      {/* Remova className do ReactMarkdown e use components para estilizar */}
                       <ReactMarkdown
                         components={{
                           p: ({ node, ...props }) => (
