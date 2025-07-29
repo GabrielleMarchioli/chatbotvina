@@ -15,8 +15,10 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://chatbotvina.vercel.app",  # Domínio do frontend no Vercel
-        "http://localhost:3000",           # Para testes locais
+        "https://chatbotvina.vercel.app",
+        "https://chatbotvina-1eawywx4m-gabriellemarchiolis-projects.vercel.app",  # Domínio do frontend no Vercel
+        "http://localhost:3000",
+         "*"           # Para testes locais
     ],
     allow_credentials=True,
     allow_methods=["*"],
